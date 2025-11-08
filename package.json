@@ -1,0 +1,94 @@
+{
+  "name": "desktop-app",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "cross-env PORT=3001 react-scripts start",
+    "build": "cross-env REACT_APP_API_BASE_URL=https://backend-ticketing-system.up.railway.app/api REACT_APP_SOCKET_URL=https://backend-ticketing-system.up.railway.app GENERATE_SOURCEMAP=false react-scripts build",
+    "build-dev": "cross-env REACT_APP_API_BASE_URL=http://localhost:3000/api REACT_APP_SOCKET_URL=http://localhost:3000 react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "electron-dev": "electron .",
+    "electron-prod": "cross-env NODE_ENV=production electron .",
+    "dev": "concurrently \"cross-env BROWSER=none PORT=3001 npm start\" \"wait-on http://localhost:3001 && npm run electron-dev\"",
+    "pack": "npm run build && electron-builder",
+    "dist": "npm run build && electron-builder --publish=never",
+    "package": "npm run build && electron-packager . TicketingAndTaskManagementSystem --platform=win32 --arch=x64 --out=dist --overwrite --icon=icons/desktop_logo.ico"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
+    "@fullcalendar/react": "^6.1.17",
+    "@fullcalendar/timegrid": "^6.1.17",
+    "@hello-pangea/dnd": "^18.0.1",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.13.0",
+    "@mui/x-date-pickers": "^8.6.0",
+    "axios": "^1.4.0",
+    "chart.js": "^4.3.0",
+    "date-fns": "^4.1.0",
+    "electron-store": "^11.0.2",
+    "pdfkit": "^0.17.1",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.11.1",
+    "react-scripts": "^5.0.1",
+    "recharts": "^3.0.2",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1",
+    "cross-env": "^7.0.3",
+    "electron": "^38.2.1",
+    "electron-builder": "^24.6.4",
+    "electron-packager": "^17.1.2",
+    "wait-on": "^7.0.1"
+  },
+  "description": "Desktop app for the Ticketing and Task Management System",
+  "author": "",
+  "license": "MIT",
+  "homepage": "./",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "build": {
+    "appId": "com.taskmanagement.desktop",
+    "productName": "TicketingAndTaskManagementSystem",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "main.js",
+      "package.json",
+      "icons/**/*"
+    ],
+    "win": {
+      "target": "dir",
+      "sign": false,
+      "icon": "icons/desktop_logo.png"
+    },
+    "mac": {
+      "icon": "icons/desktop_logo.png"
+    },
+    "linux": {
+      "icon": "icons/desktop_logo.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
