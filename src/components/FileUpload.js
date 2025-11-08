@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -16,7 +16,8 @@ import {
   CircularProgress,
   Alert,
   Tooltip,
-  TextField
+  TextField,
+  useTheme
 } from '@mui/material';
 import {
   AttachFile as AttachFileIcon,
@@ -56,6 +57,17 @@ const FileUpload = ({
   const [remarks, setRemarks] = useState('');
   const [pendingFileOperation, setPendingFileOperation] = useState(null); // 'upload' or 'delete'
   const [pendingFileData, setPendingFileData] = useState(null);
+
+  const theme = useTheme();
+
+  // Cleanup effect to revoke object URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const validateFile = (file) => {
     if (files.length >= maxFiles) {
@@ -154,6 +166,11 @@ const FileUpload = ({
   };
 
   const handleViewFile = async (file) => {
+    // Clean up previous URL if it exists
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
     try {
       const fullUrl = `${process.env.REACT_APP_API_BASE_URL || 'https://backend-ticketing-system.up.railway.app/api'}/files/${file.id}/download`;
       
@@ -377,9 +394,13 @@ const FileUpload = ({
       <Dialog 
         open={previewOpen} 
         onClose={() => { 
+          // Clean up object URL to prevent memory leaks
+          if (previewUrl && previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl);
+          }
           setPreviewOpen(false); 
-          setPreviewUrl(null); 
-          setPreviewType(null); 
+          setPreviewUrl(''); 
+          setPreviewType('image'); 
           setPreviewText(''); 
           setPreviewError(''); 
           setPdfLoadFailed(false);
@@ -485,22 +506,29 @@ const FileUpload = ({
           {previewType === 'error' && (
             <Box sx={{ textAlign: 'center' }}>
               <Typography color="error" gutterBottom>Error loading file: {previewError}</Typography>
-              <Button 
-                variant="outlined" 
-                onClick={() => window.open(previewUrl, '_blank')}
-              >
-                Try Opening in New Tab
-              </Button>
+              {previewUrl && (
+                <Button 
+                  variant="outlined" 
+                  onClick={() => window.open(previewUrl, '_blank')}
+                >
+                  Try Opening in New Tab
+                </Button>
+              )}
             </Box>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => { 
+            // Clean up object URL to prevent memory leaks
+            if (previewUrl && previewUrl.startsWith('blob:')) {
+              URL.revokeObjectURL(previewUrl);
+            }
             setPreviewOpen(false); 
-            setPreviewUrl(null); 
-            setPreviewType(null); 
+            setPreviewUrl(''); 
+            setPreviewType('image'); 
             setPreviewText(''); 
             setPreviewError(''); 
+            setPdfLoadFailed(false);
           }}>
             Close
             </Button>
